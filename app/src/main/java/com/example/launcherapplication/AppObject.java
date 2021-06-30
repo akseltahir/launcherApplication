@@ -4,16 +4,17 @@ import android.graphics.drawable.Drawable;
 
 public class AppObject {
     private String  name,
-                    packageName;
+                    packageName,
+                    appCategory;
     private Drawable image;
     private Boolean isAppInDrawer;
-    //private int appCategory;
 
-    public AppObject(String packageName, String name, Drawable image, Boolean isAppInDrawer) {
+    public AppObject(String packageName, String name, Drawable image, Boolean isAppInDrawer, String appCategory) {
         this.name = name;
         this.image = image;
         this.packageName = packageName;
         this.isAppInDrawer = isAppInDrawer;
+        this.appCategory = appCategory;
     }
 
     public String getPackageName() {
@@ -26,6 +27,9 @@ public class AppObject {
         return image;
     }
     public Boolean getIsAppInDrawer() {return isAppInDrawer;}
+    public String getAppCategory() {
+        return appCategory;
+    }
 
     public void setPackageName(String packageName) {
         this.packageName = packageName;
@@ -38,5 +42,8 @@ public class AppObject {
     }
     public void setIsAppInDrawer(Boolean appInDrawer) {
         this.isAppInDrawer = appInDrawer;
+    }
+    public void setAppCategory(String appCategory) {
+        this.appCategory = appCategory;
     }
 }

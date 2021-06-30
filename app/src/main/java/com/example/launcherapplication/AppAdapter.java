@@ -23,6 +23,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView textView;
         public ImageView img;
+        public TextView category;
 
         //This is the subclass ViewHolder which simply
         //'holds the views' for us to show on each row
@@ -32,6 +33,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             //Finds the views from our row.xml
             textView = (TextView) itemView.findViewById(R.id.applicationNameTextView);
             img = (ImageView) itemView.findViewById(R.id.applicationIconImageView);
+            category = (TextView) itemView.findViewById(R.id.appCategory);
             itemView.setOnClickListener(this);
         }
 
@@ -80,11 +82,16 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         String appLabel = appsList.get(i).getName();
         String appPackage = appsList.get(i).getPackageName();
         Drawable appIcon = appsList.get(i).getImage();
+        String appCategory = appsList.get(i).getAppCategory();
 
         TextView textView = (TextView) viewHolder.textView;
         textView.setText(appLabel);
+
         ImageView imageView = viewHolder.img;
         imageView.setImageDrawable(appIcon);
+
+        TextView appcat = (TextView) viewHolder.category;
+        appcat.setText(appCategory);
     }
 
 

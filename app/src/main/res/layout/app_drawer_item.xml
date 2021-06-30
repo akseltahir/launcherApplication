@@ -24,8 +24,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/usageTimeTextView"
-            android:text="3h20m"
+            android:id="@+id/appCategory"
+            android:text="category"
             android:textSize="15sp"
             android:layout_marginTop="2sp"/>
     </LinearLayout>

@@ -4,14 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +23,7 @@ public class AppDrawer extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.app_drawer);
+        getSupportActionBar().hide();   //hide action bar for fullscreen experience
 
         RecyclerView recyclerView = findViewById(R.id.appsList);
 
@@ -33,21 +32,19 @@ public class AppDrawer extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
 
         //this is an async task that loads the contents of the appadater the moment you click the appdrawer button, instead of doing it inside of the appadapter itself.
-        new myThread().execute();
+        new AppAdapterThread().execute();
 
         // notify the adapter that the data has changed
         //recyclerView.notifyDataSetChanged();
     }
 
-    public class myThread extends AsyncTask<Void, Void, String> {
+    @SuppressLint("StaticFieldLeak")
+    public class AppAdapterThread extends AsyncTask<Void, Void, String> {
 
         @Override
         protected String doInBackground(Void... Params) {
 
             PackageManager pm = getPackageManager();
-
-            //this is the packagemanager for application category
-            PackageManager pmi = getPackageManager();
             appsList = new ArrayList<>();
 
             Intent i = new Intent(Intent.ACTION_MAIN, null);
@@ -56,27 +53,26 @@ public class AppDrawer extends AppCompatActivity {
             List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
             for(ResolveInfo ri:allApps) {
 
-//// attempt at getting application category, come back later to this
-//                try {
-//                    ApplicationInfo appsInfo = pmi.getApplicationInfo(ri.activityInfo.packageName, 0);
-//
-////                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-//                        int appCategory = appsInfo.category;
-//                        //String categoryTitle = (String) ApplicationInfo.getCategoryTitle(  , appCategory);
-//
-//                } catch (PackageManager.NameNotFoundException e) {
-//                    e.printStackTrace();
-//                }
 
-                AppObject app = new AppObject(ri.activityInfo.packageName, ri.loadLabel(pm).toString(), ri.activityInfo.loadIcon(pm), false);
+                // Application categorisation method
+                int categoryCode = -1;   //if exception occurs, the app will be uncategorised
+                try {
+                    //fetching the application category from the package manager
+                    categoryCode = getPackageManager().getApplicationInfo(ri.activityInfo.packageName, 0).category;
 
-                //             app.label = ri.loadLabel(pm);
-                //             app.packageName = ri.activityInfo.packageName;
-                //             app.icon = ri.activityInfo.loadIcon(pm);
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                String categoryName;
+                String[] applicationCategories = {"General","Games","Audio","Videos","Images","Social and Internet","News","Maps","Productivity","Accessibility"};
+                categoryName = applicationCategories[categoryCode+1];
+
+
+                AppObject app = new AppObject(ri.activityInfo.packageName, ri.loadLabel(pm).toString(), ri.activityInfo.loadIcon(pm), false, categoryName);
                 adapter.addApp(app);
             }
-            return "Success";
 
+            return "Success";
         }
 
         @Override
@@ -84,7 +80,6 @@ public class AppDrawer extends AppCompatActivity {
             super.onPostExecute(result);
             updateStuff();
         }
-
     }
 
     public void updateStuff() {
