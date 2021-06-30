@@ -11,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,33 +40,37 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             int pos = getAdapterPosition();
             Context context = v.getContext();
 
-            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(appsList.get(pos).getName());
+            Intent launchIntent = context.getPackageManager().getLaunchIntentForPackage(appsList.get(pos).getPackageName());
             context.startActivity(launchIntent);
             //Toast.makeText(v.getContext(), appsList.get(pos).getName(), Toast.LENGTH_LONG).show();
 
         }
     }
 
-
+    public void addApp(AppObject app) {
+        appsList.add(app);
+    }
 
     public AppAdapter(Context c) {
+        appsList = new ArrayList<>();
+
+    }
 
         //This is where we build our list of app details, using the app
         //object we created to store the label, package name and icon
 
-        PackageManager pm = c.getPackageManager();
-        appsList = new ArrayList<AppObject>();
-
-        Intent i = new Intent(Intent.ACTION_MAIN, null);
-        i.addCategory(Intent.CATEGORY_LAUNCHER);
-
-        List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
-        for(ResolveInfo ri:allApps) {
-            AppObject app = new AppObject(ri.activityInfo.packageName, ri.loadLabel(pm).toString(), ri.activityInfo.loadIcon(pm), false);
-            appsList.add(app);
-        }
-
-    }
+//        PackageManager pm = c.getPackageManager();
+//        appsList = new ArrayList<AppObject>();
+//
+//        Intent i = new Intent(Intent.ACTION_MAIN, null);
+//        i.addCategory(Intent.CATEGORY_LAUNCHER);
+//
+//        List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
+//        for(ResolveInfo ri:allApps) {
+//            AppObject app = new AppObject(ri.activityInfo.packageName, ri.loadLabel(pm).toString(), ri.activityInfo.loadIcon(pm), false);
+//            appsList.add(app);
+//        }
+//    }
 
     @Override
     public void onBindViewHolder(AppAdapter.ViewHolder viewHolder, int i) {
@@ -91,7 +97,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         return appsList.size();
     }
 
-
+    @NonNull
     @Override
     public AppAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 

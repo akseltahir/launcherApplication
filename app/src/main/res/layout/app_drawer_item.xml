@@ -3,29 +3,30 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_margin="5sp">
+    android:layout_margin="15sp">
     <ImageView
-        android:layout_width="40sp"
-        android:layout_height="40sp"
+        android:layout_width="50sp"
+        android:layout_height="50sp"
         android:id="@+id/applicationIconImageView"
         android:src="@mipmap/ic_launcher"/>
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginHorizontal="5sp">
+        android:layout_marginHorizontal="15sp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/applicationNameTextView"
             android:text="Application name"
-            android:textSize="15sp" />
+            android:textStyle="bold"
+            android:textSize="20sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/usageTimeTextView"
             android:text="3h20m"
-            android:textSize="10sp"
+            android:textSize="15sp"
             android:layout_marginTop="2sp"/>
     </LinearLayout>
 </LinearLayout>

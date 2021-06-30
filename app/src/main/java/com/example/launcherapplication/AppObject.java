@@ -7,6 +7,7 @@ public class AppObject {
                     packageName;
     private Drawable image;
     private Boolean isAppInDrawer;
+    //private int appCategory;
 
     public AppObject(String packageName, String name, Drawable image, Boolean isAppInDrawer) {
         this.name = name;
