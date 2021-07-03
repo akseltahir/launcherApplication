@@ -67,19 +67,20 @@ public class MainActivity extends AppCompatActivity {
         //intent.setData(Uri.parse("tel:"));
         startActivity(intent);
     }
-    
+
+
+
     /*
     Simple method to fetch the calendar data for the homescreen visualisation
      */
     private void dateViewInstantiation() {
         TextView dateTimeDisplay = (TextView) findViewById(R.id.dateView);
         Calendar calendar;
-        SimpleDateFormat dateFormat;
         String date;
 
         calendar = Calendar.getInstance();
 
-        dateFormat = new SimpleDateFormat("MMM d, EEE");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM d, EEE");
         date = dateFormat.format(calendar.getTime());
         dateTimeDisplay.setText(date);
     }

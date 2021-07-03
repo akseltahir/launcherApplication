@@ -2,15 +2,14 @@ package com.example.launcherapplication;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.drawable.Drawable;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,10 +19,11 @@ import java.util.List;
 public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
     public List<AppObject> appsList;
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public TextView textView;
-        public ImageView img;
-        public TextView category;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnCreateContextMenuListener {
+        public TextView appNameTV;
+        public ImageView appIconIV;
+        public TextView appCategoryTV;
+        public LinearLayout appDrawerItemLL;
 
         //This is the subclass ViewHolder which simply
         //'holds the views' for us to show on each row
@@ -31,10 +31,13 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             super(itemView);
 
             //Finds the views from our row.xml
-            textView = (TextView) itemView.findViewById(R.id.applicationNameTextView);
-            img = (ImageView) itemView.findViewById(R.id.applicationIconImageView);
-            category = (TextView) itemView.findViewById(R.id.appCategory);
+            appNameTV = (TextView) itemView.findViewById(R.id.applicationNameTextView);
+            appIconIV = (ImageView) itemView.findViewById(R.id.applicationIconImageView);
+            appCategoryTV = (TextView) itemView.findViewById(R.id.appCategoryTextView);
+            appDrawerItemLL = (LinearLayout) itemView.findViewById(R.id.app_drawer_item);
+
             itemView.setOnClickListener(this);
+            itemView.setOnCreateContextMenuListener(this);
         }
 
         @Override
@@ -47,62 +50,15 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
             //Toast.makeText(v.getContext(), appsList.get(pos).getName(), Toast.LENGTH_LONG).show();
 
         }
+
+        @Override
+        public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            menu.add(this.getAdapterPosition(), 1, 0, "Add to Favourites");
+            menu.add(this.getAdapterPosition(), 2, 1, "App info");
+            menu.add(this.getAdapterPosition(), 3, 2, "Uninstall app");
+        }
     }
 
-    public void addApp(AppObject app) {
-        appsList.add(app);
-    }
-
-    public AppAdapter(Context c) {
-        appsList = new ArrayList<>();
-
-    }
-
-        //This is where we build our list of app details, using the app
-        //object we created to store the label, package name and icon
-
-//        PackageManager pm = c.getPackageManager();
-//        appsList = new ArrayList<AppObject>();
-//
-//        Intent i = new Intent(Intent.ACTION_MAIN, null);
-//        i.addCategory(Intent.CATEGORY_LAUNCHER);
-//
-//        List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
-//        for(ResolveInfo ri:allApps) {
-//            AppObject app = new AppObject(ri.activityInfo.packageName, ri.loadLabel(pm).toString(), ri.activityInfo.loadIcon(pm), false);
-//            appsList.add(app);
-//        }
-//    }
-
-    @Override
-    public void onBindViewHolder(AppAdapter.ViewHolder viewHolder, int i) {
-
-        //Here we use the information in the list we created to define the views
-
-        String appLabel = appsList.get(i).getName();
-        String appPackage = appsList.get(i).getPackageName();
-        Drawable appIcon = appsList.get(i).getImage();
-        String appCategory = appsList.get(i).getAppCategory();
-
-        TextView textView = (TextView) viewHolder.textView;
-        textView.setText(appLabel);
-
-        ImageView imageView = viewHolder.img;
-        imageView.setImageDrawable(appIcon);
-
-        TextView appcat = (TextView) viewHolder.category;
-        appcat.setText(appCategory);
-    }
-
-
-    @Override
-    public int getItemCount() {
-
-        //This method needs to be overridden so that Androids knows how many items
-        //will be making it into the list
-
-        return appsList.size();
-    }
 
     @NonNull
     @Override
@@ -115,5 +71,43 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
         ViewHolder viewHolder = new ViewHolder(view);
         return viewHolder;
+    }
+
+
+    @Override
+    public void onBindViewHolder(AppAdapter.ViewHolder viewHolder, int i) {
+
+        //Here we use the information in the list we created to define the views
+
+        String appLabel = appsList.get(i).getName();
+        String appPackage = appsList.get(i).getPackageName();
+        Drawable appIcon = appsList.get(i).getImage();
+        String appCategory = appsList.get(i).getAppCategory();
+
+        TextView textView = (TextView) viewHolder.appNameTV;
+        textView.setText(appLabel);
+
+        ImageView imageView = viewHolder.appIconIV;
+        imageView.setImageDrawable(appIcon);
+
+        TextView appcat = (TextView) viewHolder.appCategoryTV;
+        appcat.setText(appCategory);
+    }
+
+
+    @Override
+    public int getItemCount() {
+        //This method needs to be overridden so that Androids knows how many items
+        //will be making it into the list
+        return appsList.size();
+    }
+
+    public void addApp(AppObject app) {
+        appsList.add(app);
+    }
+
+    public AppAdapter(Context c) {
+        appsList = new ArrayList<>();
+
     }
 }

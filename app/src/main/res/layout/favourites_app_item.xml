@@ -4,11 +4,11 @@
     android:layout_width="match_parent"
     android:orientation="horizontal"
     android:layout_margin="15sp"
-    android:id="@+id/app_drawer_item">
+    android:id="@+id/faveAppItemTV">
     <ImageView
         android:layout_width="50sp"
         android:layout_height="50sp"
-        android:id="@+id/applicationIconImageView"
+        android:id="@+id/faveAppIconIV"
         android:src="@mipmap/ic_launcher"/>
     <LinearLayout
         android:layout_width="wrap_content"
@@ -18,15 +18,15 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/applicationNameTextView"
+            android:id="@+id/faveAppNameTV"
             android:text="Application name"
             android:textStyle="bold"
             android:textSize="20sp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/appCategoryTextView"
-            android:text="category"
+            android:id="@+id/faveAppUsageTimeTV"
+            android:text="03h20m"
             android:textSize="15sp"
             android:layout_marginTop="2sp"/>
     </LinearLayout>
