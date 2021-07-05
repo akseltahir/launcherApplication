@@ -1,8 +1,11 @@
 package com.example.launcherapplication;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInstaller;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -53,6 +56,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+            View viewthing = v;
             menu.add(this.getAdapterPosition(), 1, 0, "Add to Favourites");
             menu.add(this.getAdapterPosition(), 2, 1, "App info");
             menu.add(this.getAdapterPosition(), 3, 2, "Uninstall app");
@@ -92,6 +96,11 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
         TextView appcat = (TextView) viewHolder.appCategoryTV;
         appcat.setText(appCategory);
+    }
+
+    public void uninstallApp(int position) {
+        appsList.remove(position);
+        notifyDataSetChanged();
     }
 
 

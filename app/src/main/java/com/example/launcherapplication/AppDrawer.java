@@ -6,10 +6,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.LauncherApps;
+import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Rect;
@@ -113,26 +115,49 @@ public class AppDrawer extends AppCompatActivity {
         switch (item.getItemId())
         {
             case 1: // add to favourites in homescreen
-                displayMessage("Added to Favourites");
+                addAppToFavourites();
+
                 return true;
 
             case 2: // show information about app
                 showApplicationInfo();
                 return true;
 
-            case 3: // uninstall application
-                displayMessage("Uninstalled application");
+            case 3: // uninstall application. NOT WORKING AT THE MOMENT
+                adapter.uninstallApp(item.getGroupId());
 
-                //this isn't working atm.
-                //uninstallApp("name");
+                //The code here doesnt show any error messages but also it doesn't work.
+                // I think its because this appslist doesnt actually have the apps or something. Try to do the same thing in AppAdapter.
+
+//                String pck = appsList.get(item.getGroupId()).getPackageName();
+//                Intent broadcastIntent = new Intent(Intent.ACTION_DELETE);
+//                PendingIntent pendingIntent;
+//                pendingIntent = PendingIntent.getActivity(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+//                PackageInstaller packageInstaller = getPackageManager().getPackageInstaller();
+//                packageInstaller.uninstall(pck,pendingIntent.getIntentSender());
+
+                displayMessage("Uninstalled application");
                 return true;
 
-            // delete this later, it's supposed to be an unreachable message
             default:
                 displayMessage("You should not be seeing this message");
         }
 
         return super.onContextItemSelected(item);
+    }
+
+    /**
+     * This method adds the selected app to favourites if
+     *      1. the app is installed
+     *      2. the app is not already in favourites
+     */
+    private void addAppToFavourites() {
+        if(true) { //check if installed
+            if (true) { //check if not already in faves list
+                //my life is miserable
+                displayMessage("Added to Favourites");
+            } else displayMessage("App is already in favourites");
+        } else displayMessage("App is not installed on device");
     }
 
     /**
@@ -171,17 +196,18 @@ public class AppDrawer extends AppCompatActivity {
 //        }
     }
 
-    //not working currently. Need to figure out how to take packageName info from the selected recyclerArray item and pass it onto this method.
-    //Also what is ClassName?
-    private void uninstallApp(String packageName) {
-        Intent detailsIntent = new Intent();
-        detailsIntent.setClassName("com.android.settings","com.android.settings.InstalledAppDetails");
-
-        //ApiLevel greater than or equal to 8
-        detailsIntent.putExtra("pkg", "Appliction_Package_NAme");
-
-        startActivity(detailsIntent);
-    }
+//    //not working currently. Need to figure out how to take packageName info from the selected recyclerArray item and pass it onto this method.
+//    //Also what is ClassName?
+//    private void uninstallApp(String packageName, MenuItem item) {
+////        Intent detailsIntent = new Intent();
+////        detailsIntent.setClassName("com.android.settings","com.android.settings.InstalledAppDetails");
+////
+////        //ApiLevel greater than or equal to 8
+////        detailsIntent.putExtra("pkg", "Appliction_Package_NAme");
+////        startActivity(detailsIntent);
+//
+//        adapter.uninstallApp(item.getGroupId());
+//    }
 
     // shows a little message for every context menu selection action.
     private void displayMessage(String message) {

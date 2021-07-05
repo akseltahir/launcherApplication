@@ -45,7 +45,7 @@ public class FavouritesListFragment extends RecyclerView.Adapter<FavouritesListF
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.fragment_item, parent, false);
+                .inflate(R.layout.favourites_app_item, parent, false);
         return new ViewHolder(view);
     }
 
