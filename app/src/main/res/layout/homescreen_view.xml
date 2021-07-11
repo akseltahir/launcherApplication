@@ -67,6 +67,13 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     android:layout_margin="5pt">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/your_favourite_apps"
+                        android:textSize="25sp"
+                        android:layout_margin="5pt"
+                        android:id="@+id/faveAppsText"/>
 
                     <fragment
                         android:name="com.example.launcherapplication.FavouriteAppFragment"
@@ -155,6 +162,8 @@
                     android:orientation="vertical"
                     android:layout_margin="5pt">
                     <Button
+                        android:id="@+id/button1"
+                        android:onClick="button1Click"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Add Widgets"/>

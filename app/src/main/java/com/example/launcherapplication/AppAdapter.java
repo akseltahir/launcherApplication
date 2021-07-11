@@ -1,9 +1,7 @@
 package com.example.launcherapplication;
 
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageInstaller;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.view.ContextMenu;
@@ -84,7 +82,6 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         //Here we use the information in the list we created to define the views
 
         String appLabel = appsList.get(i).getName();
-        String appPackage = appsList.get(i).getPackageName();
         Drawable appIcon = appsList.get(i).getImage();
         String appCategory = appsList.get(i).getAppCategory();
 
@@ -98,10 +95,6 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         appcat.setText(appCategory);
     }
 
-    public void uninstallApp(int position) {
-        appsList.remove(position);
-        notifyDataSetChanged();
-    }
 
 
     @Override
@@ -111,12 +104,20 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
         return appsList.size();
     }
 
+    public void removeAppFromList(int position) {
+        appsList.remove(position);
+        notifyDataSetChanged();
+    }
+
+    public String getAppPackageName(int position) {
+        return appsList.get(position).getPackageName();
+    }
+
     public void addApp(AppObject app) {
         appsList.add(app);
     }
 
     public AppAdapter(Context c) {
         appsList = new ArrayList<>();
-
     }
 }

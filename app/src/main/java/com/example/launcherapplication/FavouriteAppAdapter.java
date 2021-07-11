@@ -20,7 +20,7 @@ import java.util.List;
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
  * TODO: Replace the implementation with code for your data type.
  */
-public class FavouritesListFragment extends RecyclerView.Adapter<FavouritesListFragment.ViewHolder> {
+public class FavouriteAppAdapter extends RecyclerView.Adapter<FavouriteAppAdapter.ViewHolder> {
 
     private final List<AppObject> faveAppsList;
 
@@ -68,9 +68,9 @@ public class FavouritesListFragment extends RecyclerView.Adapter<FavouritesListF
     }
 
 
-    public FavouritesListFragment(List<AppObject> items) {
-        faveAppsList = items;
-    }
+//    public FavouritesListFragment(List<AppObject> items) {
+//        faveAppsList = items;
+//    }
 
     @Override
     public int getItemCount() {
@@ -79,5 +79,9 @@ public class FavouritesListFragment extends RecyclerView.Adapter<FavouritesListF
 
     public void addApp(AppObject app) {
         faveAppsList.add(app);
+    }
+
+    public FavouriteAppAdapter(Context c) {
+        faveAppsList = new ArrayList<>();
     }
 }

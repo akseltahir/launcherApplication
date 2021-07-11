@@ -6,25 +6,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.LauncherApps;
-import android.content.pm.PackageInstaller;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.graphics.Rect;
 import android.net.Uri;
+import android.net.sip.SipSession;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class AppDrawer extends AppCompatActivity {
     private ArrayList<AppObject> appsList;
     private AppAdapter adapter;
     private final LauncherApps mLauncherApps = null;
+    public static final String SHARED_PREFS = "sharedPrefs";
+    public static final String PACKAGE_NAME = "pckName";
+    public List<String> favouriteApps = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,15 +50,48 @@ public class AppDrawer extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
+        //RUN IF YOU'VE REINSTALLED THE APP AND THE SHAREDPREFS ARE GONE. SEE YOUR VOICE NOTE ON YOUR PHONE TO LEARN WHY.
+//        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//
+//        Gson gson = new Gson();
+//        String json = sharedPreferences.getString(PACKAGE_NAME, "empty");
+//
+// //        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+// //        favouriteApps = gson.fromJson(json,type); //puts the apps in sharedpref into the variable
+//
+//        favouriteApps.add("object 1"); //adds the selected package name into the variable, which now also houses the previous shared prefs
+//        favouriteApps.add("object 2");
+//        String json1 = gson.toJson(favouriteApps); //puts the new variable into shared prefs.
+//
+//        editor.putString(PACKAGE_NAME, json1);
+//        editor.commit();
+
+
+
         //this is an async task that loads the contents of the appadater the moment you click the appdrawer button, instead of doing it inside of the appadapter itself.
         new AppAdapterThread().execute();
-
-        // notify the adapter that the data has changed
-        //recyclerView.notifyDataSetChanged();
     }
 
+    //delete later
+    public void seeSharedPrefs(View view) {
+        TextView txt = findViewById(R.id.sharedprefTextView);
+        SharedPreferences pref = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefeditor = pref.edit();
+        prefeditor.putString(SHARED_PREFS, "empty");
+        //pref.edit().remove(SHARED_PREFS);
+        prefeditor.apply();
+
+        String prefs = pref.getAll().toString();
+        Log.d("sharedprefs", prefs);
+        Log.d("faveapps", favouriteApps.toString());
+    }
+
+
     /**
-     * Loads the app drawer asynchronously
+     * Loads the app drawer asynchronously. Currently it doesn't matter because the appdrawer view opens at the same time as the appadapter.
+     * Will be useful if I put the entire appdrawer activity in a viewpage fragment that loads with the homescreen though.
+     * Then the appadapter would load before the user even looks at it
      */
     @SuppressLint("StaticFieldLeak")
     public class AppAdapterThread extends AsyncTask<Void, Void, String> {
@@ -75,6 +112,7 @@ public class AppDrawer extends AppCompatActivity {
                         ri.loadLabel(pm).toString(),
                         ri.activityInfo.loadIcon(pm), false,
                         getAppCategory(ri));
+                appsList.add(app);
                 adapter.addApp(app);
             }
 
@@ -104,6 +142,9 @@ public class AppDrawer extends AppCompatActivity {
         }
     }
 
+
+
+
     /**
      * Context menu selection method.
      * @param item
@@ -111,54 +152,82 @@ public class AppDrawer extends AppCompatActivity {
      */
     @Override
     public boolean onContextItemSelected(@NonNull MenuItem item) {
-
         switch (item.getItemId())
         {
             case 1: // add to favourites in homescreen
-                addAppToFavourites();
-
+                addAppToFavourites(item.getGroupId());
                 return true;
 
             case 2: // show information about app
                 showApplicationInfo();
                 return true;
 
-            case 3: // uninstall application. NOT WORKING AT THE MOMENT
-                adapter.uninstallApp(item.getGroupId());
-
-                //The code here doesnt show any error messages but also it doesn't work.
-                // I think its because this appslist doesnt actually have the apps or something. Try to do the same thing in AppAdapter.
-
-//                String pck = appsList.get(item.getGroupId()).getPackageName();
-//                Intent broadcastIntent = new Intent(Intent.ACTION_DELETE);
-//                PendingIntent pendingIntent;
-//                pendingIntent = PendingIntent.getActivity(this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-//                PackageInstaller packageInstaller = getPackageManager().getPackageInstaller();
-//                packageInstaller.uninstall(pck,pendingIntent.getIntentSender());
-
-                displayMessage("Uninstalled application");
+            case 3: // remove application from app drawer. Currently working only with one app instance.
+                uninstallApp(item);
                 return true;
-
-            default:
-                displayMessage("You should not be seeing this message");
         }
-
         return super.onContextItemSelected(item);
     }
+
+
 
     /**
      * This method adds the selected app to favourites if
      *      1. the app is installed
      *      2. the app is not already in favourites
+     *      The ifs are obviously not implemented yet. I've got not clue how to do them
+     * @param position
      */
-    private void addAppToFavourites() {
-        if(true) { //check if installed
-            if (true) { //check if not already in faves list
-                //my life is miserable
+    private void addAppToFavourites(int position) {
+
+        if(checkIfFavouritesExist()) { //runs if there are apps in shared prefs
+            if (checkIfAppNotInList(position)) { //runs if the app is not in the list already
+                //add app package String to shared preferences,
+                //then make favourites handler look for an addition to the shared prefs
+                SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+
+                Gson gson = new Gson();
+                String json = sharedPreferences.getString(PACKAGE_NAME, "empty");
+
+                Type type = new TypeToken<ArrayList<String>>() {}.getType();
+                favouriteApps = gson.fromJson(json,type); //puts the apps in sharedpref into the variable
+
+                String pck = adapter.getAppPackageName(position); //gets the package name selected
+                favouriteApps.add(pck); //adds the selected package name into the variable, which now also houses the previous shared prefs
+
+                String json1 = gson.toJson(favouriteApps); //puts the new variable into shared prefs.
+
+                editor.putString(PACKAGE_NAME, json1);
+                editor.apply();
+
                 displayMessage("Added to Favourites");
-            } else displayMessage("App is already in favourites");
-        } else displayMessage("App is not installed on device");
+            }
+        } else displayMessage("App is already in favourites");
+
+        SharedPreferences.OnSharedPreferenceChangeListener listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+            public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
+
+            }
+        };
     }
+
+
+
+    private boolean checkIfAppNotInList(int position) {
+        return true;
+    }
+
+    //returns true if favourites exist
+    private boolean checkIfFavouritesExist() {
+        SharedPreferences pref = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String id = pref.getString(PACKAGE_NAME, "empty");
+
+        Log.d("list123123", id);
+        if (id.isEmpty()) return false;
+        else return true;
+    }
+
 
     /**
      *      This method is supposed to open up the system settings to the page that shows information about the selected application.
@@ -196,26 +265,40 @@ public class AppDrawer extends AppCompatActivity {
 //        }
     }
 
-//    //not working currently. Need to figure out how to take packageName info from the selected recyclerArray item and pass it onto this method.
-//    //Also what is ClassName?
-//    private void uninstallApp(String packageName, MenuItem item) {
-////        Intent detailsIntent = new Intent();
-////        detailsIntent.setClassName("com.android.settings","com.android.settings.InstalledAppDetails");
-////
-////        //ApiLevel greater than or equal to 8
-////        detailsIntent.putExtra("pkg", "Appliction_Package_NAme");
-////        startActivity(detailsIntent);
-//
-//        adapter.uninstallApp(item.getGroupId());
-//    }
+
+
+
+    private void uninstallApp(MenuItem item) {
+
+        Intent intent = new Intent(Intent.ACTION_DELETE);
+        intent.setData(Uri.parse("package:"+appsList.get(item.getGroupId()).getPackageName()));
+        startActivity(intent);
+
+        //the idea here is that i load a new list of apps, and if they're a different number, it'd run uninstallApp.
+        //for some reason this works all of the time though. :/
+        PackageManager pm = getPackageManager();
+        appsList = new ArrayList<>();
+        Intent i = new Intent(Intent.ACTION_MAIN, null);
+        i.addCategory(Intent.CATEGORY_LAUNCHER);
+        List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
+        if (allApps.size() != appsList.size()) {
+            adapter.removeAppFromList(item.getGroupId());
+        }
+
+        //another attempt at making the dataset change, but it doesn't work either.
+        adapter.notifyDataSetChanged();
+    }
+
+
 
     // shows a little message for every context menu selection action.
     private void displayMessage(String message) {
         Snackbar.make(findViewById(R.id.app_drawer_item), message, Snackbar.LENGTH_SHORT).show();
     }
 
+    // idk what it does, but
+    //the app crashes if i get rid of it
     public void updateStuff() {
-        // Dynamically add app list to recycler view (reflects newly added/deleted apps immediately)
         adapter.notifyItemChanged(adapter.getItemCount()-1);
     }
 
