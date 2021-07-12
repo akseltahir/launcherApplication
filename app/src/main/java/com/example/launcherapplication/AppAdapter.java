@@ -3,7 +3,6 @@ package com.example.launcherapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,7 +82,7 @@ public class AppAdapter extends RecyclerView.Adapter<AppAdapter.ViewHolder> {
 
         String appLabel = appsList.get(i).getName();
         Drawable appIcon = appsList.get(i).getImage();
-        String appCategory = appsList.get(i).getAppCategory();
+        String appCategory = appsList.get(i).getAppInfo();
 
         TextView textView = (TextView) viewHolder.appNameTV;
         textView.setText(appLabel);

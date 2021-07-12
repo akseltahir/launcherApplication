@@ -1,13 +1,17 @@
 package com.example.launcherapplication;
 
+import android.app.usage.UsageStats;
+import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.LauncherApps;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -16,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.preference.PreferenceActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -26,7 +31,10 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A fragment representing a list of Items.
@@ -34,10 +42,11 @@ import java.util.List;
 public class FavouriteAppFragment extends Fragment {
 
     private ArrayList<AppObject> appsList;
-    private AppAdapter faveAdapter;
+    private FavouriteAppAdapter faveAdapter;
     private final LauncherApps mLauncherApps = null;
     public static final String SHARED_PREFS = "sharedPrefs";
     public static final String PACKAGE_NAME = "pckName";
+    public List<String> favouriteApps = new ArrayList<String>();
 
 
     /**
@@ -62,13 +71,13 @@ public class FavouriteAppFragment extends Fragment {
 
         //Set the adapter
         RecyclerView recyclerView = (RecyclerView) view;
-        faveAdapter = new AppAdapter(getActivity());
+        faveAdapter = new FavouriteAppAdapter(getActivity());
 
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.setAdapter(faveAdapter);
 
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Log.d("sharedprefs", sharedPreferences.getAll().toString());
         if (sharedPreferences.getString(SHARED_PREFS,null) != null) {
             loadItemsIntoRecycler();
@@ -76,22 +85,37 @@ public class FavouriteAppFragment extends Fragment {
         return view;
     }
 
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        loadItemsIntoRecycler();
-//    }
-//
+
+    //load the recyclerview again every time the fragment is resumed.
+    // This is to show the new favourite additions from the app drawer without reloading the app entirely.
+    @Override
+    public void onResume() {
+        super.onResume();
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        Log.d("sharedprefs", sharedPreferences.getAll().toString());
+        if (sharedPreferences.getString(SHARED_PREFS,null) != null) {
+            loadItemsIntoRecycler();
+        }
+    }
+
 //    @Override
 //    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
 //        super.onViewStateRestored(savedInstanceState);
-//        loadItemsIntoRecycler();
+//        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+//        Log.d("sharedprefs", sharedPreferences.getAll().toString());
+//        if (sharedPreferences.getString(SHARED_PREFS,null) != null) {
+//            loadItemsIntoRecycler();
+//        }
 //    }
 //
 //    @Override
 //    public void onStart() {
 //        super.onStart();
-//        loadItemsIntoRecycler();
+//        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+//        Log.d("sharedprefs", sharedPreferences.getAll().toString());
+//        if (sharedPreferences.getString(SHARED_PREFS,null) != null) {
+//            loadItemsIntoRecycler();
+//        }
 //    }
 
     private void loadItemsIntoRecycler() {
@@ -105,7 +129,7 @@ public class FavouriteAppFragment extends Fragment {
         List<String> sharedPrefPackages = returnAllItemsInSharedPrefs(); //fetches package name list in shared preferences
         List<ResolveInfo> allInstalledPackages = pm.queryIntentActivities(i, 0); //fetches all packages on device
 
-
+        faveAdapter.clear();
         //Log.d("list123123", allInstalledPackages.toString());
         for(ResolveInfo ri:allInstalledPackages) {
             //TextView txtvw = getActivity().findViewById(R.id.faveAppsText);
@@ -116,16 +140,49 @@ public class FavouriteAppFragment extends Fragment {
                 AppObject app = new AppObject(ri.activityInfo.packageName,
                         ri.loadLabel(pm).toString(),
                         ri.activityInfo.loadIcon(pm), false,
-                        "empty");
+                        getAppUsageTime(ri));
+                appsList.add(app);
                 faveAdapter.addApp(app);
             }
         }
     }
 
+    //returns the application usage time for the day
+    private String getAppUsageTime(ResolveInfo ri) {
+
+        long endTime = System.currentTimeMillis();
+        long beginTime = endTime-1000;
+        String usageTime="";
+        long usageTimeL = 0;
+
+
+        UsageStatsManager usm = (UsageStatsManager) getActivity().getSystemService(Context.USAGE_STATS_SERVICE);
+        //if i understand right, this holds a list of usage stats for all installed packages.
+        List<UsageStats> usageStats = usm.queryUsageStats(UsageStatsManager.INTERVAL_DAILY,beginTime,endTime);
+
+        //goes through list of usage stats, comparing the package names to that of the parameter variable.
+        //when it finds the usage stat of the parameter variable's packageName,
+        //adds the value of total usageTime in foreground to the usageTime variable
+        for (UsageStats usageStat:usageStats) {
+            Log.d("usageTime0", usageStat.getPackageName()+" "+String.valueOf(usageStat.getTotalTimeInForeground()));
+            Log.d("riPackageName", ri.activityInfo.packageName);
+            if (usageStat.getPackageName().equals(ri.activityInfo.packageName)) {
+                usageTimeL = usageStat.getTotalTimeInForeground();
+                Log.d("usageTime2", String.valueOf(usageStat.getTotalTimeInForeground()));
+            }
+        }
+
+        long minutes = (usageTimeL / 1000) / 60;
+        long seconds = (usageTimeL / 1000) % 60;
+        usageTime = minutes + "m" + seconds + "s";
+        //int i = getActivity().getPackageManager().getAppS
+        return usageTime;
+    }
+
     private List<String> returnAllItemsInSharedPrefs() {
         List<String> packageNames = new ArrayList<String>();
 
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         Gson gson = new Gson();
         String json = sharedPreferences.getString(PACKAGE_NAME,"empty");
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
@@ -134,6 +191,51 @@ public class FavouriteAppFragment extends Fragment {
         return packageNames;
     }
 
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId())
+        {
+            case 1: // add to favourites in homescreen
+                removeAppFromFavourites(item);
+                return true;
+
+            case 2: // show information about app
+                showApplicationInfo();
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    private void showApplicationInfo() {
+    }
+
+    private void removeAppFromFavourites(MenuItem item) {
+
+        String packageName = appsList.get(item.getGroupId()).getPackageName();
+
+        //remove app package String from shared preferences,
+        //then make favourites handler look for an addition to the shared prefs
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString(PACKAGE_NAME, "empty");
+
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        favouriteApps = gson.fromJson(json,type); //puts the apps in sharedpref into the variable
+        Log.d("faveApps1", favouriteApps.toString());
+
+        String pck = packageName; //gets the package name selected
+        favouriteApps.remove(pck); //adds the selected package name into the variable, which now also houses the previous shared prefs
+        Log.d("faveApps2", favouriteApps.toString());
+        String json1 = gson.toJson(favouriteApps); //puts the new variable into shared prefs.
+        Log.d("faveAppsJSON1", json1.toString());
+        editor.putString(PACKAGE_NAME, json1);
+        editor.commit();
+
+        faveAdapter.removeAppFromList(item.getGroupId());
+        faveAdapter.notifyDataSetChanged();
+    }
 
 
 //    @SuppressLint("StaticFieldLeak")
