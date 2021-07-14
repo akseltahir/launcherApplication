@@ -2,7 +2,6 @@ package com.example.launcherapplication;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -13,16 +12,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.example.launcherapplication.dummy.DummyContent.DummyItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * {@link RecyclerView.Adapter} that can display a {@link DummyItem}.
- * TODO: Replace the implementation with code for your data type.
- */
 public class FavouriteAppAdapter extends RecyclerView.Adapter<FavouriteAppAdapter.ViewHolder> {
 
     private final List<AppObject> faveAppsList;
