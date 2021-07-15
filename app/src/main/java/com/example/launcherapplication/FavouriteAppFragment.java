@@ -221,8 +221,9 @@ public class FavouriteAppFragment extends Fragment {
         Gson gson = new Gson();
         String json = sharedPreferences.getString(PACKAGE_NAME, "empty");
 
-        Type type = new TypeToken<ArrayList<String>>() {}.getType();
-        favouriteApps = gson.fromJson(json,type); //puts the apps in sharedpref into the variable
+        Type type = new TypeToken<ArrayList<String>>() {
+        }.getType();
+        favouriteApps = gson.fromJson(json, type); //puts the apps in sharedpref into the variable
         Log.d("faveApps1", favouriteApps.toString());
 
         String pck = packageName; //gets the package name selected
@@ -236,82 +237,4 @@ public class FavouriteAppFragment extends Fragment {
         faveAdapter.removeAppFromList(item.getGroupId());
         faveAdapter.notifyDataSetChanged();
     }
-
-
-//    @SuppressLint("StaticFieldLeak")
-//    public class FaveAppAdapterThread extends AsyncTask<Void, Void, String> {
-//
-//        @Override
-//        protected String doInBackground(Void... Params) {
-//
-//            PackageManager pm = this.getActivity().getPackageManager();
-//            appsList = new ArrayList<>();
-//
-//            Intent i = new Intent(Intent.ACTION_MAIN, null);
-//            i.addCategory(Intent.CATEGORY_LAUNCHER);
-//
-//            @SuppressLint("QueryPermissionsNeeded") List<ResolveInfo> allApps = pm.queryIntentActivities(i, 0);
-//            for(ResolveInfo ri:allApps) {
-//
-//                AppObject app = new AppObject(ri.activityInfo.packageName,
-//                        ri.loadLabel(pm).toString(),
-//                        ri.activityInfo.loadIcon(pm), false,
-//                        getAppCategory(ri));
-//                adapter.addApp(app);
-//            }
-//
-//            return "Success";
-//        }
-//
-//        private String getAppCategory(ResolveInfo ri) {
-//            // Application categorisation method
-//            int categoryCode = -1;   //if exception occurs, the app will be uncategorised
-//            try {
-//                //fetching the application category from the package manager
-//                categoryCode = getPackageManager().getApplicationInfo(ri.activityInfo.packageName, 0).category;
-//
-//            } catch (PackageManager.NameNotFoundException e) {
-//                e.printStackTrace();
-//            }
-//            String categoryName;
-//            String[] applicationCategories = {"General","Games","Audio","Videos","Images","Social and Internet","News","Maps","Productivity","Accessibility"};
-//            categoryName = applicationCategories[categoryCode+1];
-//            return categoryName;
-//        }
-//
-//        @Override
-//        protected void onPostExecute(String result) {
-//            super.onPostExecute(result);
-//            updateStuff();
-//        }
-//    }
 }
-
-
-    //    // TODO: Customize parameter argument names
-//    private static final String ARG_COLUMN_COUNT = "column-count";
-//    // TODO: Customize parameters
-//    private int mColumnCount = 1;
-//
-
-
-//
-//    // TODO: Customize parameter initialization
-//    @SuppressWarnings("unused")
-//    public static FavouriteAppFragment newInstance(int columnCount) {
-//        FavouriteAppFragment fragment = new FavouriteAppFragment();
-//        Bundle args = new Bundle();
-//        args.putInt(ARG_COLUMN_COUNT, columnCount);
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
-//
-//    @Override
-//    public void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//
-//        if (getArguments() != null) {
-//            mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
-//        }
-//    }
-//

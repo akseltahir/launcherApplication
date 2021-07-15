@@ -3,7 +3,7 @@
     android:layout_height="wrap_content"
     android:layout_width="match_parent"
     android:orientation="horizontal"
-    android:layout_margin="15sp"
+    android:layout_marginVertical="15sp"
     android:id="@+id/faveAppItemTV">
     <ImageView
         android:layout_width="50sp"
