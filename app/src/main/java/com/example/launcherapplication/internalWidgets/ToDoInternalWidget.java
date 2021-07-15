@@ -44,21 +44,19 @@ public class ToDoInternalWidget extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_to_do_internal_widget, container, false);
 
         //db is a variable of type TaskerDbHelper
         db = new TaskerDbHelper(getContext());
         list=db.getAllTasks();
         adapt = new ToDoAdapter(getContext(),R.layout.fragment_to_do_internal_widget_item , list, db);
-
-        ListView listTask = inflater.inflate(R.layout.fragment_to_do_internal_widget, container, false).findViewById(R.id.listView1);
-
+        Log.d("dbTasks",list.get(1).getTaskName());
+        ToDoListView listTask = view.findViewById(R.id.listView1);
         listTask.setAdapter(adapt);
 
         // Inflate the layout for this fragment
 
-        View view = inflater.inflate(R.layout.fragment_to_do_internal_widget, container, false);
-
-        Button button = view.findViewById(R.id.button1);
+        TextView button = view.findViewById(R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

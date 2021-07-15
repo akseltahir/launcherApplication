@@ -58,7 +58,8 @@ public class TaskerDbHelper extends SQLiteOpenHelper {
 
 
     public List<Task> getAllTasks() {
-        List<Task> taskList = new ArrayList<Task>();
+        List<Task> taskList;
+        taskList = new ArrayList<Task>();
         // Select All Query
         String selectQuery = "SELECT  * FROM "
                 + TABLE_TASKS;

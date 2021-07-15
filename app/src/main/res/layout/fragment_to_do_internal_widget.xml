@@ -2,12 +2,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context=".internalWidgets.ToDoInternalWidget"
-    android:orientation="vertical"
-    android:layout_margin="5pt"
-    android:background="@color/white">
+    android:orientation="vertical">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -15,13 +13,13 @@
         android:textSize="25sp"
         android:id="@+id/toDoText"/>
 
-    <ListView
+    <com.example.launcherapplication.internalWidgets.ToDoListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
-        android:layout_height="100sp"/>
+        android:layout_height="match_parent"/>
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <EditText
@@ -30,12 +28,13 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:importantForAutofill="no" />
-        <Button
+        <TextView
             android:id="@+id/button1"
             android:textSize="40sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="10sp"
             android:text="@string/addToDo"/>
+
     </LinearLayout>
 </LinearLayout>

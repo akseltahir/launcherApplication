@@ -57,11 +57,11 @@
                     android:layout_margin="5pt"
                     android:id="@+id/homescreenWidget2">
 
-                    <androidx.fragment.app.FragmentContainerView
+                    <fragment
                         android:id="@+id/internalToDoWidgetFragment"
                         android:name="com.example.launcherapplication.internalWidgets.ToDoInternalWidget"
                         android:layout_height="wrap_content"
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_margin="5pt"
                         tools:layout="@layout/fragment_to_do_internal_widget" />
                 </LinearLayout>
@@ -80,7 +80,7 @@
                         android:layout_margin="5pt"
                         android:id="@+id/faveAppsText"/>
 
-                    <androidx.fragment.app.FragmentContainerView
+                    <fragment
                         android:name="com.example.launcherapplication.FavouriteAppFragment"
                         android:id="@+id/favouritesAppFragmentHolder"
                         android:layout_height="wrap_content"
